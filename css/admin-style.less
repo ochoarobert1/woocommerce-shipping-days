@@ -1,0 +1,37 @@
+// compress: false, javascriptEnabled: true
+/* --------------------------------------------------------------
+/* MAIN LESS MIXINS AND FUNCTIONS - LESSHAT
+-------------------------------------------------------------- */
+@import 'less/_lesshat.less';
+/* --------------------------------------------------------------
+VARIABLES
+-------------------------------------------------------------- */
+
+@black: #000000;
+@white: #ffffff;
+
+/* --------------------------------------------------------------
+BODY DEFAULTS
+-------------------------------------------------------------- */
+.woocommerce_page_woocommerce-shipping-days {
+    & #wpcontent {
+        padding-left: 0;
+    }
+
+    & .woocommerce-main-header-panel {
+        display: block;
+        background: @white;
+        padding: 1.5rem 2rem;
+
+        & h1 {
+            font-size: 1rem;
+            margin: 0;
+        }
+    }
+
+    & .woocommerce-main-content-panel {
+        margin: 3rem;
+        background: @white;
+        padding: 0.5rem 1.5rem;
+    }
+}

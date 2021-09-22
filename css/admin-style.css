@@ -1,0 +1,26 @@
+/* --------------------------------------------------------------
+/* MAIN LESS MIXINS AND FUNCTIONS - LESSHAT
+-------------------------------------------------------------- */
+/* --------------------------------------------------------------
+VARIABLES
+-------------------------------------------------------------- */
+/* --------------------------------------------------------------
+BODY DEFAULTS
+-------------------------------------------------------------- */
+.woocommerce_page_woocommerce-shipping-days #wpcontent {
+  padding-left: 0;
+}
+.woocommerce_page_woocommerce-shipping-days .woocommerce-main-header-panel {
+  display: block;
+  background: #ffffff;
+  padding: 1.5rem 2rem;
+}
+.woocommerce_page_woocommerce-shipping-days .woocommerce-main-header-panel h1 {
+  font-size: 1rem;
+  margin: 0;
+}
+.woocommerce_page_woocommerce-shipping-days .woocommerce-main-content-panel {
+  margin: 3rem;
+  background: #ffffff;
+  padding: 0.5rem 1.5rem;
+}
