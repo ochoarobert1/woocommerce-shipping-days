@@ -24,3 +24,7 @@ BODY DEFAULTS
   background: #ffffff;
   padding: 0.5rem 1.5rem;
 }
+.woocommerce_page_woocommerce-shipping-days .woocommerce-main-content-panel .form-table th,
+.woocommerce_page_woocommerce-shipping-days .woocommerce-main-content-panel .form-table td {
+  padding: 0.5rem !important;
+}

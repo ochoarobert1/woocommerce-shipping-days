@@ -14,7 +14,6 @@
  * @package WooShipDays
  */
 
-
 class WooShipDays
 {
     const SLUG = 'woo_shipping_days';
@@ -24,18 +23,29 @@ class WooShipDays
     {
         add_action('admin_menu', array($this, 'custom_submenu'));
         add_action('admin_init', array($this, 'wooshipdays_settings'));
-        add_action('admin_enqueue_scripts', array($this, 'custom_enqueue_scripts'));
+        add_action('admin_enqueue_scripts', array($this, 'custom_admin_scripts'));
+        add_action('wp_enqueue_scripts', array($this, 'custom_frontend_scripts'));
+        add_action('woocommerce_proceed_to_checkout', array($this, 'custom_cart_message'), 15);
+        add_action('woocommerce_review_order_before_submit', array($this, 'custom_cart_message'), 10);
+        add_action('woocommerce_thankyou_cod', array($this, 'custom_cart_message'), 15);
+        add_action('woocommerce_email_after_order_table', array($this, 'custom_cart_message'), 10);
     }
 
     public function wooshipdays_settings()
     {
         register_setting('wooshipdays-settings-group', 'dias');
+        register_setting('wooshipdays-settings-group', 'hora');
         register_setting('wooshipdays-settings-group', 'checkout_message');
     }
 
-    public function custom_enqueue_scripts()
+    public function custom_admin_scripts()
     {
         wp_enqueue_style('admin_styles', plugins_url('css/admin-style.css', __FILE__), array(), null, 'all');
+    }
+
+    public function custom_frontend_scripts()
+    {
+        wp_enqueue_style('frontend_styles', plugins_url('css/front-style.css', __FILE__), array(), null, 'all');
     }
 
     public function custom_submenu()
@@ -58,54 +68,67 @@ class WooShipDays
             <tr valign="top">
                 <th scope="row">Lunes</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('lunes', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="lunes" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Monday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Monday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
                 <th scope="row">Martes</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('martes', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="martes" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Tuesday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Tuesday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
                 <th scope="row">Miércoles</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('miercoles', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="miercoles" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Wednesday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Wednesday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
                 <th scope="row">Jueves</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('jueves', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="jueves" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Thursday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Thursday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
                 <th scope="row">Viernes</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('viernes', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="viernes" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Friday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Friday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
                 <th scope="row">Sábado</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('sabado', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="sabado" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Saturday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Saturday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
                 <th scope="row">Domingo</th>
                 <?php $checked = ''; ?>
-                <?php $checked = (in_array('domingo', get_option('dias'))) ? 'checked="checked"' : ''; ?>
-                <td><input type="checkbox" name="dias[]" value="domingo" <?php echo $checked; ?> /></td>
+                <?php $checked = (in_array('Sunday', get_option('dias'))) ? 'checked="checked"' : ''; ?>
+                <td><input type="checkbox" name="dias[]" value="Sunday" <?php echo $checked; ?> /></td>
             </tr>
 
             <tr valign="top">
-                <th colspan="2" scope="row">Mensaje en el Carrito/Checkout</th>
+                <th colspan="2" scope="row">
+                    <h2>Hora máxima a recibir pedidos del mismo día</h2>
+                </th>
+            </tr>
+
+            <tr valign="top">
+                <td colspan="2"><input type="time" name="hora" value="<?php echo esc_attr(get_option('hora')); ?>" /></td>
+            </tr>
+
+            <tr valign="top">
+                <th colspan="2" scope="row">
+                    <h2>Mensaje en el Carrito/Checkout</h2>
+                    <small>Nota: Deja siempre el texto {dia} para que el sistema pueda reemplazar esto con el cálculo del día a despachar. Puedes usar HTML</small>
+                </th>
             </tr>
 
             <tr valign="top">
@@ -117,6 +140,106 @@ class WooShipDays
     </form>
 </div>
 <?php
+        $content = ob_get_clean();
+        echo $content;
+    }
+
+    public function get_closest_day()
+    {
+        $startDate = DateTime::createFromFormat('U', current_time('timestamp'));
+        $closest_day = 0;
+        $closest_day_text = '';
+        $shipping_days = get_option('dias');
+
+        foreach ($shipping_days as $item) {
+            $endDate  = DateTime::createFromFormat('U', current_time('timestamp'));
+            $endDate->modify('next ' . $item);
+            $difference = $endDate->diff($startDate);
+            if ($closest_day > $difference->format("%a")) {
+                $closest_day = $difference->format("%a");
+                $closest_day_text = $endDate->format("l");
+                $closest_day_format = $endDate->format("d/m/Y");
+            } else {
+                $closest_day = $difference->format("%a");
+            }
+        }
+
+        switch ($closest_day_text) {
+            case 'Monday':
+                $closest_day_text = 'Lunes';
+                break;
+
+            case 'Tuesday':
+                $closest_day_text = 'Tuesday';
+                break;
+
+            case 'Wednesday':
+                $closest_day_text = 'Miércoles';
+                break;
+
+            case 'Thursday':
+                $closest_day_text = 'Jueves';
+                break;
+
+            case 'Friday':
+                $closest_day_text = 'Viernes';
+                break;
+
+            case 'Saturday':
+                $closest_day_text = 'Sábado';
+                break;
+
+            case 'Sunday':
+                $closest_day_text = 'Domingo';
+                break;
+        }
+
+        $response = array(
+            'dia' =>  $closest_day_text,
+            'formato' => $closest_day_format
+        );
+
+        return $response;
+    }
+
+    public function custom_cart_message()
+    {
+        $shipping_days = get_option('dias');
+        $current_day = date("l");
+
+        ob_start();
+        if (!in_array($current_day, $shipping_days)) {
+            $closest_day_arr = $this->get_closest_day();
+
+            $custom_message = get_option('checkout_message');
+            $custom_message = str_replace([
+                '{dia}',
+            ], [
+                $closest_day_arr['dia'] . ' ' . $closest_day_arr['formato']
+            ], $custom_message); ?>
+<div class="woocommerce-custom-message">
+    <?php echo $custom_message ?>
+</div>
+<?php
+        } else {
+            $startDate = DateTime::createFromFormat('U', current_time('timestamp'));
+            $limit_hour_raw = get_option('hora');
+            $limit_hour = explode(':', $limit_hour_raw);
+            if (intval($startDate->format('H')) > intval($limit_hour[0])) {
+                $closest_day_arr = $this->get_closest_day();
+
+                $custom_message = get_option('checkout_message');
+                $custom_message = str_replace([
+                    '{dia}',
+                ], [
+                    $closest_day_arr['dia'] . ' ' . $closest_day_arr['formato']
+                ], $custom_message); ?>
+<div class="woocommerce-custom-message">
+    <?php echo $custom_message ?>
+</div>
+<?php
+            }
+        }
         $content = ob_get_clean();
         echo $content;
     }
