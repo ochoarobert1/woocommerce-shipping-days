@@ -149,18 +149,25 @@ class WooShipDays
         $startDate = DateTime::createFromFormat('U', current_time('timestamp'));
         $closest_day = 0;
         $closest_day_text = '';
+        $closest_day_format = '';
         $shipping_days = get_option('dias');
 
         foreach ($shipping_days as $item) {
             $endDate  = DateTime::createFromFormat('U', current_time('timestamp'));
+
             $endDate->modify('next ' . $item);
             $difference = $endDate->diff($startDate);
-            if ($closest_day > $difference->format("%a")) {
-                $closest_day = $difference->format("%a");
+
+            if ($closest_day == 0) {
+                $closest_day = intval($difference->d);
                 $closest_day_text = $endDate->format("l");
                 $closest_day_format = $endDate->format("d/m/Y");
             } else {
-                $closest_day = $difference->format("%a");
+                if ($closest_day > intval($difference->d)) {
+                    $closest_day = intval($difference->d);
+                    $closest_day_text = $endDate->format("l");
+                    $closest_day_format = $endDate->format("d/m/Y");
+                }
             }
         }
 
@@ -170,7 +177,7 @@ class WooShipDays
                 break;
 
             case 'Tuesday':
-                $closest_day_text = 'Tuesday';
+                $closest_day_text = 'Martes';
                 break;
 
             case 'Wednesday':
