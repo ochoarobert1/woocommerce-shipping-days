@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Dias de Despacho
  * Plugin URI: https://robertochoaweb.com/
  * Description: Plugin para seleccion de dias de despacho.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Robert Ochoa
  * Author URI: https://robertochoaweb.com
  * Text Domain: woo_shipping_days
@@ -146,11 +146,45 @@ class WooShipDays
 
     public function get_closest_day()
     {
-        $startDate = DateTime::createFromFormat('U', current_time('timestamp'));
         $closest_day = 0;
         $closest_day_text = '';
         $closest_day_format = '';
         $shipping_days = get_option('dias');
+        $limit_hour_raw = get_option('hora');
+        $limit_hour = explode(':', $limit_hour_raw);
+
+        /* START DATE - TODAY */
+        $startDate = DateTime::createFromFormat('U', current_time('timestamp'));
+        /* DATE FOR COMPARISON */
+        $endDate  = DateTime::createFromFormat('U', current_time('timestamp'));
+        $endDate->modify('+1 day');
+
+        foreach ($shipping_days as $item) {
+            $nextDays[$item] =  DateTime::createFromFormat('U', current_time('timestamp'));
+            $nextDays[$item]->modify('next ' . $item);
+        }
+
+        //echo '<pre>';
+        //var_dump($nextDays);
+        //echo '</pre>';
+
+        foreach ($nextDays as $dia => $value) {
+            $difference = $value->diff($startDate);
+
+            //echo '<pre>';
+            //var_dump($difference->d);
+            //echo '</pre>';
+
+            if ((intval($difference->d) <= 0) && (intval($startDate->format('H')) > intval($limit_hour[0]))) {
+                if (($key = array_search($dia, $shipping_days)) !== false) {
+                    unset($shipping_days[$key]);
+                }
+            }
+        }
+
+        //echo '<pre>';
+        //var_dump($shipping_days);
+        //echo '</pre>';
 
         foreach ($shipping_days as $item) {
             $endDate  = DateTime::createFromFormat('U', current_time('timestamp'));
@@ -213,6 +247,8 @@ class WooShipDays
     {
         $shipping_days = get_option('dias');
         $current_day = date("l");
+
+        //var_dump($this->get_closest_day());
 
         ob_start();
         if (!in_array($current_day, $shipping_days)) {
